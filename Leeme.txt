@@ -1,0 +1,7 @@
+
+
+Créditos:
+http://norfipc.com/inf/javascript-como-ocultar-mostrar-elementos-paginas-web.html -->sript para mostrar o ocultar un div.
+http://typeface.neocracy.org/ -->fuente tipográfica.
+http://www.nosolocss.com --> barra para recuperar velocidad normal.
+http://jeremybouny.fr --> fondo dinámico
