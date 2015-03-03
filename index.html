@@ -1,67 +1,49 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
-		<title>Keep in run</title>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<script src="js/three.min.js"></script>
-<link rel="stylesheet" href="css/style.css" />
-		<script src="js/controles.js"></script>
-		<script src="js/animateprogress.js"></script>
-				<script src="js/math.js"></script>
-		<script src="js/escena.js"></script>
-		<script src="fonts/helvetiker_font/helvetiker_regular.typeface.js"></script>
-		
-		
-<style>canvas { width: 100%; height: 100%; }
-
-span {
--o-transition: all 1s ease;
--moz-transition: all 1s ease;
--webkit-transition: all 1s ease;
-transition: all 1s ease;
-}
-</style>
+		<meta charset="utf-8">
+		<title>Keep in Run</title>
+		<link href="assets/css/style.css" rel="stylesheet">
 	</head>
+
 	<body onload="webGLStart();">
-		<table width= 100% height= 100% border = 1>
-			<tr>
-				
-			<td width=20%>
-				<div class="progress" id="div_progreso" style='display:none;'>
-			<progress id="progreso" max="100" value="0"></progress>
-			<span></span>
+		<canvas align = "center" id="heightmap"></canvas>
+	
+		<div align = "center" id="canvas-3d" class="viewer"></div>
 		
-		</div><h2>Puntos: <span id="marcador">0</span></h3></td>
+		<!-- External libraries -->
+
+		<script src="assets/libs/jquery.min.js"></script>
+		<script src="assets/libs/three.min.js"></script>
+		<script src="assets/libs/FastBlur.js"></script>
+		<script src="assets/libs/three/OrbitControls.js"></script>
+		<!-- Generator files -->
 		
-		<td><div width= 100% height= 100%  id="canvas" align ="center"></div>
-		</td>
+		<script src="assets/randoms/default.js"></script>
+        <script src="assets/randoms/mersenne-twister.js"></script>
 		
-		</tr><tr><td colspan="2">
+		<script src="assets/generators/perlinnoise.js"></script>
 		
-		<h2>Indicaciones:</h2>
-	    <ul><table width= 100%><tr >
-			<td>
-				        <li>Controles: Flechas del teclado</li>
-	        <li> Puertas verdes: Camino a seguir</li>
-	        </td>
-	        <td ></td>
-	        <td>
-	        	        <li> Pasar por la puerta: 1pto</li>
-	        <li> chocar con los palos: 0.5ptos</li>
-	        </td>
-	                <td >
-	        	        <li> Si no pasas por la puerta, aumenta la velocidad</li>
-	        <li>Para reducirla, hay que pasar por 10 puertas seguidas.</li>
-	        </td>
-			
-			</tr></table>
+		<script src="assets/colors/mountains.js"></script>
 
 
 
-	    </ul>
-	    </td>
-	    </tr>
-	    </table>
+		
+		<script src="assets/filters/blur.js"></script>
+        <script src="assets/filters/gameterrain.js"></script>
+        <script src="assets/filters/circle.js"></script>
+
+        <script src="assets/verticeseffects/destructure.js"></script>
+		<script src="assets/verticeseffects/depthnoise.js"></script>
+		
+		<script src="assets/terraingen.js"></script>
+		
+		<!--files -->
+		
+		<script src="assets/js/escena.js"></script>
+		<script src="assets/js/math.js"></script>
+		<script src="assets/js/controles.js"></script>
+		<script src="assets/js/animateprogress.js"></script>
+		
 	</body>
 </html>

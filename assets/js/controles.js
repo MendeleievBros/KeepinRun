@@ -69,12 +69,34 @@ function controles(){
 	delta=(Date.now()-ultimoTiempo)/1000;
 	if (delta>0)
     {
-    	if (TECLA.ARRIBA) camaraY += 0.3;
-    	if (TECLA.ABAJO) camaraY -= 0.3;
+    	if (TECLA.ARRIBA) {
+	Pderecha.position.y-= 0.3;
+	Pizquierda.position.y-= 0.3;
+	Parriba.position.y-= 0.3;
+	Pabajo.position.y-= 0.3;
+		}
+    	if (TECLA.ABAJO) {
+	Pderecha.position.y+= 0.3;
+	Pizquierda.position.y+= 0.3;
+	Parriba.position.y+= 0.3;
+	Pabajo.position.y+= 0.3;
+		}
 
-		if (TECLA.DERECHA) camaraX += 0.3;
-		if (TECLA.IZQUIERDA)  camaraX -= 0.3;
+		if (TECLA.DERECHA){
+	Pderecha.position.x-= 0.3;
+	Pizquierda.position.x-= 0.3;
+	Parriba.position.x-= 0.3;
+	Pabajo.position.x-= 0.3;
+		}
+
+		if (TECLA.IZQUIERDA) {
+							Pderecha.position.x+= 0.3;
+	Pizquierda.position.x+= 0.3;
+	Parriba.position.x+= 0.3;
+	Pabajo.position.x+= 0.3;
+		}
+
     				
-			renderEscena();
+			
 	}
 }
