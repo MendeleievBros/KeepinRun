@@ -282,7 +282,7 @@ function animacion(){
 
 
 function animarEscena(){
-	console.log(escena_actual);
+
 	requestAnimFrame(animarEscena); // que se llame en cada frame
 	terrain.rotation.y+= 0.002; // rotamos el terreno
 	movimiento();
