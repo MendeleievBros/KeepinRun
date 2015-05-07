@@ -1,9 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 	<head>
+		<meta http-equiv=”content-encoding” content=”gzip” />
 		<meta charset="utf-8">
 		<title>Keep in Run</title>
-		<link href="assets/css/style.css" rel="stylesheet">
+		
+		<style type="text/css"> 
+		body {
+	
+	margin : 0px;
+	padding : 0px;
+	color : #fff;
+	overflow: hidden;
+}
+
+#heightmap {
+	position : absolute;
+	top : 5px;
+	left : 5px;
+	display: none;
+}
+
+.property-name a { color : #eee; }
+
+		</style>
 	</head>
 
 	<body onload="webGLStart();">
@@ -12,6 +32,169 @@
 		<div align = "center" id="canvas-3d" class="viewer"></div>
 		
 		<!-- External libraries -->
+		<script>
+			// color de montañas
+	var MOUNTAINS_COLORS =
+{
+	Apply: function( inGeometry, inParameters )
+	{
+		var step = 1000;
+		var colors = inGeometry.getAttribute( 'color' ).array;
+		var positions = inGeometry.getAttribute( 'position' ).array;
+		
+		for( var i = 0; i < positions.length; i += 3 )
+		{
+			var depth = Math.min( 1, 0.2 + ( 0.85 + 0.3 * inParameters.alea.Random() ) * 0.8 * Math.round( step * positions[i + 1] / inParameters.depth ) / step );
+				
+			colors[i] = depth * depth;
+			colors[i + 1] = depth;
+			colors[i + 2] = depth * depth * depth;
+		}
+	},
+	
+};
+
+ //filtro de color
+var BLUR_FILTER =
+{
+	Apply: function( inCanvas, inParameters )
+	{
+		boxBlurCanvasRGB( inCanvas, 0, 0, inCanvas.width, inCanvas.height, Math.round(inParameters.filterparam), 2 );
+	}
+};
+
+// filtro
+
+var CIRCLE_FILTER =
+{
+	Apply: function( inCanvas, inParameters )
+	{
+		var context = inCanvas.getContext( "2d" );
+		
+		// Apply a radial gradient
+		var gradient = context.createRadialGradient( inCanvas.width*0.5, inCanvas.height*0.5, 0, inCanvas.width*0.5, inCanvas.height*0.5, Math.min( inCanvas.height, inCanvas.width ) * 0.5 );
+		gradient.addColorStop( 0.0, 'transparent' );
+		gradient.addColorStop( 0.6, 'transparent' );
+		gradient.addColorStop( 1.0, '#000000' );
+		context.fillStyle = gradient;
+		
+		context.rect( 0, 0, inCanvas.width, inCanvas.height );
+		context.fill();
+		context.rect( 0, 0, inCanvas.width, inCanvas.height );
+		context.fill();
+		
+		BLUR_FILTER.Apply( inCanvas, inParameters );
+	}
+};
+
+
+// fuinciones matemáticas
+
+function aleatorio(min, max) {
+
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+
+	}
+	
+	var RAND_DEFAULT =
+{
+	Random: function()
+	{
+		return Math.random();
+	}
+};
+
+			
+			function degInRad(deg) {
+    return deg * Math.PI / 180;
+}  
+
+// animacion de barra aburrimiento
+
+/*   @ Barras de progreso HTML5 animadas con Javascript
+     @ author Agustín Baraza (contacto@nosolocss.com)
+     @ Copyright 2014 nosolocss.com. All rights reserved
+     @ http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+     @ link http://www.nosolocss.com 	 */
+
+function mostrar(){
+document.getElementById('div_progreso').style.display = 'block';}
+
+
+function ocultar(){
+document.getElementById('div_progreso').style.display = 'none';}
+
+function animateprogress (id, val){		
+
+
+	var getRequestAnimationFrame = function () {  /* <------- Declaro getRequestAnimationFrame intentando obtener la máxima compatibilidad con todos los navegadores */
+		return window.requestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||   
+		window.mozRequestAnimationFrame ||
+		window.oRequestAnimationFrame ||
+		window.msRequestAnimationFrame ||
+		function ( callback ){
+			window.setTimeout(enroute, 1 / 60 * 1000);
+		};
+		
+	};
+	
+	var fpAnimationFrame = getRequestAnimationFrame();   
+	var i = 0;
+	var animacion = function () {
+			
+	if (i<=val) 
+		{
+			document.querySelector(id).setAttribute("value",i);      /* <----  Incremento el valor de la barra de progreso */
+			document.querySelector(id+"+ span").innerHTML = i+"%";     /* <---- Incremento el porcentaje y lo muestro en la etiqueta span */
+			i++;
+			fpAnimationFrame(animacion);          /* <------------------ Mientras que el contador no llega al porcentaje fijado la función vuelve a llamarse con fpAnimationFrame     */
+		}
+										
+	}
+
+		fpAnimationFrame(animacion);   /*  <---- Llamo la función animación por primera vez usando fpAnimationFrame para que se ejecute a 60fps  */
+				
+}
+
+
+// generadores de vértices
+var DESTRUCTURE_EFFECT =
+{
+	Apply: function( inGeometry, inParameters )
+	{
+		var positions = inGeometry.getAttribute( 'position' ).array,
+			densityWidth = inParameters.width / inParameters.widthSegments,
+			densityHeight = inParameters.height / inParameters.heightSegments,
+			densityDepth = inParameters.depth / 255,
+			param = 1;
+			
+		for( var i = 0; i < positions.length; i++ )
+		{
+			positions[i] += ( inParameters.alea.Random() - 0.5 ) * densityWidth * param;
+		}
+	},
+	
+};
+
+
+var DEPTHNOISE_EFFECT =
+{
+	Apply: function( inGeometry, inParameters )
+	{
+		var positions = inGeometry.getAttribute( 'position' ).array,
+			scaleDepth = inParameters.depth / 255;
+			
+		for( var i = 1; i < positions.length; i += 3 )
+		{
+			positions[i] += scaleDepth * inParameters.alea.Random();
+		}
+	},
+	
+};
+
+
+</script>
 
 		<script src="assets/libs/jquery.min.js"></script>
 		<script src="assets/libs/three.min.js"></script>
@@ -19,31 +202,21 @@
 		<script src="assets/libs/three/OrbitControls.js"></script>
 		<!-- Generator files -->
 		
-		<script src="assets/randoms/default.js"></script>
         <script src="assets/randoms/mersenne-twister.js"></script>
 		
 		<script src="assets/generators/perlinnoise.js"></script>
-		
-		<script src="assets/colors/mountains.js"></script>
-
-
-
-		
-		<script src="assets/filters/blur.js"></script>
+	
         <script src="assets/filters/gameterrain.js"></script>
-        <script src="assets/filters/circle.js"></script>
-
-        <script src="assets/verticeseffects/destructure.js"></script>
-		<script src="assets/verticeseffects/depthnoise.js"></script>
 		
 		<script src="assets/terraingen.js"></script>
 		
 		<!--files -->
-		
+	    <script src="assets/fonts/helvetiker_font/helvetiker_regular.typeface.js"></script>
 		<script src="assets/js/escena.js"></script>
-		<script src="assets/js/math.js"></script>
 		<script src="assets/js/controles.js"></script>
-		<script src="assets/js/animateprogress.js"></script>
+		<script src="assets/js/menu.js"></script>
+		<script src="assets/js/inst.js"></script>
+		<script src="assets/js/juego.js"></script>
 		
 	</body>
 </html>

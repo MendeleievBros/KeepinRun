@@ -1,8 +1,14 @@
 var escena;
 var camara;
-var ultimoTiempo; // para controlar las teclas
 var render;
-var terrain;
+var terrain; // fóndo dinámico
+
+var CrearParedes;
+
+var objetos; // array con los objetos de la escena actual
+
+var sentido; // para controlar la transición de escenas
+var escena_actual;
 
 var derechaX; //coordenadas de las puertas
 var izquierdaX;//coordenadas de las puertas
@@ -22,18 +28,9 @@ var azary; // numeros al azar que mueven la puerta en el eje y
 var azarx;// numeros al azar que mueven la puerta en el eje x
 var azars;// numeros al azar que separan las paredes de la puerta
 
-var marcador; // para debug en pantalla
-var puntos = 0;
+var ultimoTiempo; // para controlar las teclas
 
-var altura_media; // para saber el centro de la puerta
-var ancho_medio; // para saber el centro de la puerta
-
-var velocidad = 0; // variable que aumenta la velocidad por cada puerta fallada
-var contador; // contador para crear objetos
-var puertas_velocidad = 0; // contador de puertas cruzadas para bajar la velocidad
-
-var text, theText, text3D, textMaterial, centerOffset; // para mostrar texto en pantalla
-
+ // parametros para generar las montañas, colores, altura, tamaño...
 
 var GENERATORS =
 {
@@ -66,7 +63,9 @@ var GENERATORS =
 	ms_Colors: [ null, MOUNTAINS_COLORS],
 	ms_Filters: [ null, BLUR_FILTER, GAMETERRAIN_FILTER, CIRCLE_FILTER ],
 	ms_Effects: [ null, DESTRUCTURE_EFFECT, DEPTHNOISE_EFFECT ],
-};   // parametros para generar las montañas, colores, altura, tamaño...
+};  
+
+
 var parameters = 
 {
 		alea: RAND_MT,
@@ -95,6 +94,7 @@ window.requestAnimFrame = (
 		};
 	}
 )();
+
 
 function crear_cuadros(){
 
@@ -158,6 +158,8 @@ function depurar(){
 }
 
 function movimiento(){
+	
+	if(escena_actual == "jugar"){
 	// rotamos las paredes verticales
 	Pderecha.rotation.x += 0.1;
 	Pizquierda.rotation.x += 0.1;
@@ -168,8 +170,15 @@ function movimiento(){
 	Parriba.position.z+= 0.2;
 	Pabajo.position.z+= 0.2;
 
+	if(Pderecha.position.z >= camaraZ){// si el jugador ha cruzado una puerta...
+		depurar()
+	}
 	camara.position.set( camaraX,camaraY,camaraZ);
 }
+
+}
+
+
 
 function iniciarEscena(){
 	// definimos camara, escena, render...
@@ -183,7 +192,7 @@ function iniciarEscena(){
 		
 	camara = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 1000000);
 	camara.position.set( -500,300,0);
-       escena.add(camara);
+    escena.add(camara);
 
 	render.setSize(canvasWidth, canvasHeight);
 
@@ -203,35 +212,82 @@ function iniciarEscena(){
 		
 	terrain = new THREE.Mesh( terrainGeo, terrainMaterial );
 	escena.add(terrain);
-		
-	crear_cuadros(Math.floor(Math.random() * 2)); // creamos el primer cuadro
 
 }
 
-function webGLStart() {
-		
-	iniciarEscena(); // creamos escena
 
+function webGLStart() {// funcion que inicia todo, llamada desde index.html
+	escena_actual = "menu";
+	iniciarEscena(); // creamos escena
+	cambiarEscena(escena_actual);
  	ultimoTiempo=Date.now();
-				
 	document.onkeydown=teclaPulsada;
 	document.onkeyup=teclaSoltada;
-	
 	animarEscena();
-	
-
 }		
-			
-function animarEscena(){
-	requestAnimFrame(animarEscena);
 
-	terrain.rotation.y+= 0.002;
-	movimiento()
-	controles()
-	if(Pderecha.position.z >= camaraZ){// si el jugador ha cruzado una puerta...
-		depurar()
+
+function cambiarEscena(escena){
+	eliminarEscena();
+
+	if(escena == "menu"){
+		escena_actual="menu";
+		mostrarMenu();
 	}
-	camara.position.set(camaraX,camaraY,camaraZ);
-    render.render(escena, camara);
+	if(escena == "jugar"){
+		escena_actual="jugar";
+		mostrarJuego();
+	}
+	if(escena== "instrucciones"){
+		escena_actual = "instrucciones";
+		mostrarinst();
+	}
+}
+
+
+function eliminarEscena(){
+
+	if(typeof(objetos) != "undefined"){
+		objetos.forEach(function(objeto,posicion){ // bucle que recorre los objetos de escena
+			escena.remove(objeto);
+		});
+	}
+}
+
+
+function crearEscena(){
+	   	objetos.forEach(function(objeto,posicion){
+			escena.add(objeto);
+		});
+	   
+}
+
+function animacion(){
+	requestAnimFrame(animacion);
+	
+	if(camaraZ < 250 && sentido == "+"){ // alejamos cámara
+		camaraZ +=1;
+	}
+
+	if(camaraZ == 250){ // punto máximo que se aleja
+		sentido = "-"; // invertimos sentido
+		escena_actual = "instrucciones";
+		cambiarEscena(escena_actual); // cambiamos escena
+	}
+	
+	if(sentido == "-" && camaraZ > -1){ // acercamos cámara
+		camaraZ -=1;
+	}
+}
+
+
+function animarEscena(){
+	console.log(escena_actual);
+	requestAnimFrame(animarEscena); // que se llame en cada frame
+	terrain.rotation.y+= 0.002; // rotamos el terreno
+	movimiento();
+	controles(escena_actual); // comprueba los controles
+	camara.position.set(camaraX,camaraY,camaraZ); // movemos cámara
+    render.render(escena, camara); // renderizamos
 }	
 
