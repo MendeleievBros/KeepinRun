@@ -2,7 +2,7 @@ function mostrarJuego(){
 	
 	  /* CREACION TEXTO */
 // Texto a escribir
-theText = "Marcador:";
+theText = "0";
 // Creamos geometria texto pasandole parametros
 text3d = new THREE.TextGeometry( theText, {
     size: 0.8,
@@ -20,7 +20,7 @@ textMaterial = new THREE.MeshBasicMaterial( { color: "#610B0B", overdraw: true }
 // Creamos el mesh uniendo geometria y material
 marcador = new THREE.Mesh( text3d, textMaterial );
 
-marcador.position.x = centerOffset-8;
+marcador.position.x = centerOffset-10;
 marcador.position.y = 307;
 marcador.position.z = -20;
 

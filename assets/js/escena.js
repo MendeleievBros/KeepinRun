@@ -175,6 +175,25 @@ function movimiento(){
 	}
 	camara.position.set( camaraX,camaraY,camaraZ);
 }
+if(escena_actual == "intro"){
+	
+	 if( camaraZ < -45){
+		 			camaraX = -500;
+			camaraY = 300;
+			camaraZ = 0;
+			camara.rotation.x = 0;
+	 	escena_actual = "menu";
+			cambiarEscena(escena_actual);
+ }else{
+	 
+	  camaraZ -=0.3;
+	//  camaraY +=0.05;
+	 
+ }
+	
+	
+	
+}
 
 }
 
@@ -182,8 +201,8 @@ function movimiento(){
 
 function iniciarEscena(){
 	// definimos camara, escena, render...
-	var canvasWidth = 650;
-	var canvasHeight = 500; 
+	var canvasWidth = screen.width;
+	var canvasHeight = screen.height; 
 		
 	render = new THREE.WebGLRenderer();
 	render.setClearColor(0x99FFFF, 1); // color de fondo
@@ -213,11 +232,34 @@ function iniciarEscena(){
 	terrain = new THREE.Mesh( terrainGeo, terrainMaterial );
 	escena.add(terrain);
 
+
+           var viewFullScreen = document.getElementById("view-fullscreen");
+    if (viewFullScreen) {
+        viewFullScreen.addEventListener("click", function () {
+            var docElm = document.getElementById("canvas-3d");
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            }
+            else if (docElm.msRequestFullscreen) {
+                docElm.msRequestFullscreen();
+            }
+            else if (docElm.mozRequestFullScreen) {
+                docElm.mozRequestFullScreen();
+            }
+            else if (docElm.webkitRequestFullScreen) {
+                docElm.webkitRequestFullScreen();
+            }
+        }, false);
+    }
+        
+
+
 }
 
 
 function webGLStart() {// funcion que inicia todo, llamada desde index.html
-	escena_actual = "menu";
+	
+	escena_actual = "intro";
 	iniciarEscena(); // creamos escena
 	cambiarEscena(escena_actual);
  	ultimoTiempo=Date.now();
@@ -242,6 +284,16 @@ function cambiarEscena(escena){
 		escena_actual = "instrucciones";
 		mostrarinst();
 	}
+	
+		if(escena== "intro"){
+			camaraX = 0;
+			camaraY = 1;
+			camaraZ = 10;
+			camara.rotation.x -= 0.1;
+		escena_actual = "intro";
+		mostrarintro();
+	}
+	
 }
 
 
@@ -257,6 +309,7 @@ function eliminarEscena(){
 
 function crearEscena(){
 	   	objetos.forEach(function(objeto,posicion){
+			
 			escena.add(objeto);
 		});
 	   
@@ -281,8 +334,10 @@ function animacion(){
 }
 
 
+
+
+
 function animarEscena(){
-	console.log(escena_actual);
 	requestAnimFrame(animarEscena); // que se llame en cada frame
 	terrain.rotation.y+= 0.002; // rotamos el terreno
 	movimiento();
