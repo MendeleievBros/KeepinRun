@@ -3,6 +3,8 @@ var camara;
 var render;
 var terrain; // fóndo dinámico
 
+var puntuacion;
+
 var CrearParedes;
 
 var objetos; // array con los objetos de la escena actual
@@ -95,6 +97,132 @@ window.requestAnimFrame = (
 	}
 )();
 
+function dentro_pared(){
+	
+	
+	if(camaraX > Pizquierda.position.x && camaraX < Pderecha.position.x && camaraY > Pabajo.position.y && camaraY < Parriba.position.y){
+		sumarPunto();
+	}
+
+	
+
+	
+}
+
+
+function sumarPunto(){
+	
+	puntuacion += 1;
+	eliminarEscena();
+	mostrarJuego(puntuacion)
+
+
+	
+}
+
+function crear_cuadros(){
+
+	var Material = new THREE.MeshBasicMaterial({color:"#00FF00"}); // definimos material
+    var Material1 = new THREE.MeshBasicMaterial({color:"#FF0000"}); // definimos material rojo
+	var CuadroGeometria = new THREE.BoxGeometry(0.3, 4.5, 0.3); // definimos paredes verticales
+	
+	azarx = aleatorio(-10,10);
+	azary = aleatorio(0,5); 
+	azars = aleatorio(-3,3);
+			
+	derechaX = camaraX+3+azarx+azars;
+	izquierdaX = camaraX-3+azarx;
+                   
+	Pderecha = new THREE.Mesh(CuadroGeometria, Material);      
+	Pderecha.position.set(derechaX, camaraY+azary, -40);
+	escena.add(Pderecha);
+				
+	/////////
+                
+	Pizquierda = new THREE.Mesh(CuadroGeometria, Material);
+
+	Pizquierda.position.set(izquierdaX, camaraY+azary, -40);
+
+	escena.add(Pizquierda);
+
+	/////////
+				
+	var largo = Math.abs(derechaX - izquierdaX)+0.3;
+	var posx = (derechaX+izquierdaX)/2;
+	var larguero = new THREE.BoxGeometry(largo, 0.3, 0.3);
+	altura_u =3+camaraY
+	Parriba = new THREE.Mesh(larguero, Material);
+             
+	Parriba.position.set(posx, altura_u+azary,-40);
+				
+	escena.add(Parriba);
+				
+	/////////
+	altura_d =-3+camaraY
+	Pabajo = new THREE.Mesh(larguero, Material);
+             
+	Pabajo.position.set(posx, altura_d+azary, -40);
+				
+	escena.add(Pabajo);
+	
+	ancho_medio = ( derechaX+izquierdaX)/2;			
+	altura_media = (altura_u+altura_d)/2;
+    
+    
+    var MedioGeometria = new THREE.BoxGeometry(0.7, 0.7, 0.7); // definimos paredes verticales
+	
+}
+
+function depurar(){
+	dentro_pared();
+	escena.remove(Pderecha); 
+	escena.remove(Pizquierda); 
+	escena.remove(Parriba);
+	escena.remove(Pabajo);
+	crear_cuadros(Math.floor(Math.random() * 2));
+}
+
+function movimiento(){
+	
+	if(escena_actual == "jugar"){
+	// rotamos las paredes verticales
+	Pderecha.rotation.x += 0.1;
+	Pizquierda.rotation.x += 0.1;
+	
+    // acercamos la puerta
+	Pderecha.position.z+= 0.2;
+	Pizquierda.position.z+= 0.2;
+	Parriba.position.z+= 0.2;
+	Pabajo.position.z+= 0.2;
+
+	if(Pderecha.position.z >= camaraZ){// si el jugador ha cruzado una puerta...
+		depurar()
+	}
+	camara.position.set( camaraX,camaraY,camaraZ);
+}
+if(escena_actual == "intro"){
+	
+	 if( camaraZ < -45){
+		 			camaraX = -500;
+			camaraY = 300;
+			camaraZ = 0;
+			camara.rotation.x = 0;
+	 	escena_actual = "menu";
+			cambiarEscena(escena_actual);
+ }else{
+	 
+	  camaraZ -=0.3;
+	//  camaraY +=0.05;
+	 
+ }
+	
+	
+	
+}
+
+}
+
+
 
 function iniciarEscena(){
 	// definimos camara, escena, render...
@@ -129,11 +257,34 @@ function iniciarEscena(){
 	terrain = new THREE.Mesh( terrainGeo, terrainMaterial );
 	escena.add(terrain);
 
+
+           var viewFullScreen = document.getElementById("view-fullscreen");
+    if (viewFullScreen) {
+        viewFullScreen.addEventListener("click", function () {
+            var docElm = document.getElementById("canvas-3d");
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            }
+            else if (docElm.msRequestFullscreen) {
+                docElm.msRequestFullscreen();
+            }
+            else if (docElm.mozRequestFullScreen) {
+                docElm.mozRequestFullScreen();
+            }
+            else if (docElm.webkitRequestFullScreen) {
+                docElm.webkitRequestFullScreen();
+            }
+        }, false);
+    }
+        
+
+
 }
 
 
 function webGLStart() {// funcion que inicia todo, llamada desde index.html
-	escena_actual = "intro";
+	
+	escena_actual = "menu";
 	iniciarEscena(); // creamos escena
 	cambiarEscena(escena_actual);
  	ultimoTiempo=Date.now();
@@ -150,6 +301,17 @@ function cambiarEscena(escena){
 		escena_actual="menu";
 		mostrarMenu();
 	}
+	if(escena == "jugar"){
+		puntuacion = 0;
+		escena_actual="jugar";
+		mostrarJuego(0);
+		console.log("llama");
+	}
+	if(escena== "instrucciones"){
+		escena_actual = "instrucciones";
+		mostrarinst();
+	}
+	
 		if(escena== "intro"){
 			camaraX = 0;
 			camaraY = 1;
@@ -158,6 +320,7 @@ function cambiarEscena(escena){
 		escena_actual = "intro";
 		mostrarintro();
 	}
+	
 }
 
 
@@ -173,37 +336,40 @@ function eliminarEscena(){
 
 function crearEscena(){
 	   	objetos.forEach(function(objeto,posicion){
+			
 			escena.add(objeto);
 		});
 	   
 }
 
+function animacion(){
+	requestAnimFrame(animacion);
+	
+	if(camaraZ < 250 && sentido == "+"){ // alejamos cámara
+		camaraZ +=1;
+	}
+
+	if(camaraZ == 250){ // punto máximo que se aleja
+		sentido = "-"; // invertimos sentido
+		escena_actual = "instrucciones";
+		cambiarEscena(escena_actual); // cambiamos escena
+	}
+	
+	if(sentido == "-" && camaraZ > -1){ // acercamos cámara
+		camaraZ -=1;
+	}
+}
+
+
+
+
 
 function animarEscena(){
-	
-if(escena_actual == "intro"){
-	
-	 if( camaraZ < -45){
-		 			camaraX = -500;
-			camaraY = 300;
-			camaraZ = 0;
-			camara.rotation.x = 0;
-	 	escena_actual = "menu";
-			cambiarEscena(escena_actual);
-		
-  
-}else{
-	 
-	  camaraZ -=0.3;
-	//  camaraY +=0.05;
-	 
- }
-}
 	requestAnimFrame(animarEscena); // que se llame en cada frame
 	terrain.rotation.y+= 0.002; // rotamos el terreno
+	movimiento();
 	controles(escena_actual); // comprueba los controles
 	camara.position.set(camaraX,camaraY,camaraZ); // movemos cámara
     render.render(escena, camara); // renderizamos
-
 }	
 
