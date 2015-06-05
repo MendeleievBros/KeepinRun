@@ -84,7 +84,7 @@ inst.position.z = -20;
 
 		
  
-objetos = new Array(titulo, jugar , inst );
+objetos = new Array(titulo, jugar , inst);
     CrearParedes = false;
     
 crearEscena();

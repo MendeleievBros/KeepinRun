@@ -2,7 +2,7 @@ var escena;
 var camara;
 var render;
 var terrain; // fóndo dinámico
-
+var pause;
 var puntuacion;
 
 var CrearParedes;
@@ -111,7 +111,7 @@ function dentro_pared(){
 
 
 function sumarPunto(){
-	
+	mostrarProfesor();
 	puntuacion += 1;
 	eliminarEscena();
 	mostrarJuego(puntuacion)
@@ -127,7 +127,7 @@ function crear_cuadros(){
 	var CuadroGeometria = new THREE.BoxGeometry(0.3, 4.5, 0.3); // definimos paredes verticales
 	
 	azarx = aleatorio(-10,10);
-	azary = aleatorio(0,5); 
+	azary = aleatorio(-10,10); 
 	azars = aleatorio(-3,3);
 			
 	derechaX = camaraX+3+azarx+azars;
@@ -184,7 +184,7 @@ function depurar(){
 
 function movimiento(){
 	
-	if(escena_actual == "jugar"){
+	if(escena_actual == "jugar" && !pause){
 	// rotamos las paredes verticales
 	Pderecha.rotation.x += 0.1;
 	Pizquierda.rotation.x += 0.1;
@@ -223,13 +223,12 @@ if(escena_actual == "intro"){
 }
 
 
-
 function iniciarEscena(){
 	// definimos camara, escena, render...
 	var canvasWidth = screen.width;
 	var canvasHeight = screen.height; 
-		
-	render = new THREE.WebGLRenderer();
+
+	render = new THREE.WebGLRenderer( { alpha: true } );
 	render.setClearColor(0x99FFFF, 1); // color de fondo
 		
 	escena = new THREE.Scene();
@@ -277,13 +276,14 @@ function iniciarEscena(){
         }, false);
     }
         
+	
 
 
 }
 
 
 function webGLStart() {// funcion que inicia todo, llamada desde index.html
-	
+	pause = false;
 	escena_actual = "menu";
 	iniciarEscena(); // creamos escena
 	cambiarEscena(escena_actual);
@@ -323,6 +323,84 @@ function cambiarEscena(escena){
 	
 }
 
+function mostrarProfesor(){
+	
+		/////// draw image on canvas /////////
+
+	// create a canvas element
+	var canvas2 = document.createElement('canvas');
+	var context2 = canvas2.getContext('2d');
+	// canvas contents will be used for a texture
+	var texture2 = new THREE.Texture(canvas2);
+	
+	// load an image
+	var imageObj = new Image();
+	imageObj.src = "assets/img/profesor_malvado1.png";
+	// after the image is loaded, this function executes
+	imageObj.onload = function()
+	{  
+		context2.drawImage(imageObj, 0, 0);
+		if ( texture2 ) // checks if texture exists
+			texture2.needsUpdate = true;
+	};  
+      
+    var material2 = new THREE.MeshBasicMaterial( {map: texture2, side:THREE.DoubleSide} );
+    material2.transparent = true;
+
+    var profesor = new THREE.Mesh(
+        new THREE.PlaneGeometry(canvas2.width, canvas2.height),
+        material2
+      );
+	profesor.position.set(camaraX+200,camaraY+25,-350);
+	escena.add( profesor );
+	
+			/////// draw image on canvas /////////
+
+	// create a canvas element
+	var canvas = document.createElement('canvas');
+	var context = canvas.getContext('2d');
+	// canvas contents will be used for a texture
+	var texture = new THREE.Texture(canvas);
+	
+	// load an image
+	var imageObj1 = new Image();
+	imageObj1.src = "assets/img/bocadillo.png";
+	// after the image is loaded, this function executes
+	imageObj1.onload = function()
+	{  
+		context.drawImage(imageObj1, 0, 0);
+		if ( texture ) // checks if texture exists
+			texture.needsUpdate = true;
+	};  
+      
+    var material = new THREE.MeshBasicMaterial( {map: texture, side:THREE.DoubleSide} );
+    material.transparent = true;
+
+    var mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(canvas.width, canvas.height),
+        material
+      );
+	mesh.position.set(camaraX+70,camaraY+30,-350);
+	escena.add( mesh );
+	
+	alerta = true;
+	iniciarPausa();
+	
+	
+	
+}
+
+
+function iniciarPausa(){
+	pause = true;
+	escena.remove(Pderecha); 
+	escena.remove(Pizquierda); 
+	escena.remove(Parriba);
+	escena.remove(Pabajo);
+	
+	
+	
+}
 
 function eliminarEscena(){
 
