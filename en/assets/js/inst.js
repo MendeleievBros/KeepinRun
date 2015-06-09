@@ -1,9 +1,10 @@
 function mostrarinst(){
 
 	// creamos texto....
-	texto_inst = "Instrucciones";
-	texto_l1 = "Tienes que cruzar los marcadores que aparecen en pantalla.";
-	texto_l2 = "Para ello, mueves la camara con las flechas del teclado.";
+	texto_inst = "Instructions";
+	texto_l1 = "You have to cross markers which appear on the screen.";
+	texto_l2 = "To do this,  move the camera with the arrow keys.";
+	
 
 	textMaterial = new THREE.MeshBasicMaterial( { color: "#610B0B", overdraw: true } ); // color del texto.
 
