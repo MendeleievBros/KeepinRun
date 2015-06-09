@@ -137,7 +137,7 @@ function controles(escena_actual){
 			
 			
 		}
-		if(escena_actual == "jugar"){
+		if(escena_actual == "jugar" && pause == false){
 		
     	if (TECLA.ARRIBA) {
 	Pderecha.position.y-= 0.3;

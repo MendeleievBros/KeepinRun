@@ -111,7 +111,6 @@ function dentro_pared(){
 
 
 function sumarPunto(){
-	mostrarProfesor();
 	puntuacion += 1;
 	eliminarEscena();
 	mostrarJuego(puntuacion)
@@ -180,6 +179,7 @@ function depurar(){
 	escena.remove(Parriba);
 	escena.remove(Pabajo);
 	crear_cuadros(Math.floor(Math.random() * 2));
+	mostrarProfesor();
 }
 
 function movimiento(){
@@ -324,6 +324,8 @@ function cambiarEscena(escena){
 }
 
 function mostrarProfesor(){
+	iniciarPausa();
+
 	
 		/////// draw image on canvas /////////
 
@@ -384,8 +386,6 @@ function mostrarProfesor(){
 	escena.add( mesh );
 	
 	alerta = true;
-	iniciarPausa();
-	
 	
 	
 }
@@ -393,7 +393,7 @@ function mostrarProfesor(){
 
 function iniciarPausa(){
 	pause = true;
-	escena.remove(Pderecha); 
+		escena.remove(Pderecha); 
 	escena.remove(Pizquierda); 
 	escena.remove(Parriba);
 	escena.remove(Pabajo);
